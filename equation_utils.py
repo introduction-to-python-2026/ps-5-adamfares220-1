@@ -1,22 +1,59 @@
 import re
 from collections import defaultdict
+import numpy as np
+from sympy import Matrix, lcm 
 
-def balance_reaction(reaction_string):
+def parse_chemical_reaction(reaction_string):
     sides = reaction_string.replace(" ", "").split('->')
-    reactants_str = sides.split('+')
-    products_str = sides.split('+')
+    reactants = sides.split('+')
+    products = sides.split('+')
+    return reactants, products
 
-    def _count_atoms(compound):
+def count_atoms_in_reaction(compounds):
+    atom_counts_list = []
+    for compound in compounds:
         counts = defaultdict(int)
-        for el, count in re.findall(r'([A-Z][a-z]?)([0-9]*)', compound):
-            counts[el] += int(count) if count else 1
-        return counts
+        for element, count in re.findall(r'([A-Z][a-z]?)([0-9]*)', compound):
+            counts[element] += int(count) if count else 1
+        atom_counts_list.append(counts)
+    return atom_counts_list
 
-    reactant_atoms = [_count_atoms(c) for c in reactants_str]
-    product_atoms = [_count_atoms(c) for c in products_str]
+def build_equations(reactant_atoms, product_atoms):
+    all_elements = sorted(set().union(*reactant_atoms, *product_atoms))
+    num_compounds = len(reactant_atoms) + len(product_atoms)
+    num_elements = len(all_elements)
     
-    # Placeholder for the mathematical solution
-    coefficients = None 
+    matrix = np.zeros((num_elements, num_compounds), dtype=int)
+    
+    for j, counts in enumerate(reactant_atoms):
+        for i, element in enumerate(all_elements):
+            matrix[i, j] = counts[element]
+            
+    for j, counts in enumerate(product_atoms):
+        for i, element in enumerate(all_elements):
+            matrix[i, len(reactant_atoms) + j] = -counts[element]
+            
+    return matrix
+
+def my_solve(equations_matrix):
+    A = Matrix(equations_matrix)
+    coeffs = A.nullspace()
+    
+    denominator_lcm = lcm([term.q for term in coeffs])
+    integer_coeffs = [int(term * denominator_lcm) for term in coeffs]
+    
+    scaling_factor = coeffs / integer_coeffs
+    
+    return [scaling_factor * int(term) for term in integer_coeffs]
+
+def balance_reaction(reaction):
+    reactants_str, products_str = parse_chemical_reaction(reaction)
+    reactant_atoms = count_atoms_in_reaction(reactants_str)
+    product_atoms = count_atoms_in_reaction(products_str)
+
+    equations_matrix = build_equations(reactant_atoms, product_atoms)
+    coefficients = my_solve(equations_matrix)
+
     return coefficients
 
 
