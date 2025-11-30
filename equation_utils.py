@@ -1,4 +1,23 @@
-# Add the import statements for necessary sympy functions here
+import re
+from collections import defaultdict
+
+def balance_reaction(reaction_string):
+    sides = reaction_string.replace(" ", "").split('->')
+    reactants_str = sides.split('+')
+    products_str = sides.split('+')
+
+    def _count_atoms(compound):
+        counts = defaultdict(int)
+        for el, count in re.findall(r'([A-Z][a-z]?)([0-9]*)', compound):
+            counts[el] += int(count) if count else 1
+        return counts
+
+    reactant_atoms = [_count_atoms(c) for c in reactants_str]
+    product_atoms = [_count_atoms(c) for c in products_str]
+    
+    # Placeholder for the mathematical solution
+    coefficients = None 
+    return coefficients
 
 
 ELEMENTS = [
