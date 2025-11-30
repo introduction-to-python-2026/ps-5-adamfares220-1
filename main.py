@@ -1,16 +1,23 @@
 # Add the import statements for functions from string_utils.py and equation_utils.py here
 
 
-def balance_reaction(reaction): #"Fe2O3 + H2 -> Fe + H2O"
+import re
 
-    # 1.parse reaction
-    reactants, products = parse_chemical_reaction(reaction) # [""Fe2O3", "H2"], ["Fe", "H2O""]
-    reactant_atoms = count_atoms_in_reaction(reactants) # [{"Fe":2, "O":1}, {"H":2}]
-    product_atoms = count_atoms_in_reaction(products)
 
-    # 2.build equation and solve
-    equations, coefficients = build_equations(reactant_atoms, product_atoms)
-    coefficients = my_solve(equations, coefficients) + [1]
+def count_atoms(compound):
+    return {el: int(count) if count else 1 
+            for el, count in re.findall(r'([A-Z][a-z]?)([0-9]*)', compound)}
 
-    return coefficients # [1/3, 1, 2/3, 1]
+def parse_reaction_simple(reaction_string):
+    reactants_str, products_str = reaction_string.replace(" ", "").split('->')
+    reactants = [count_atoms(c) for c in reactants_str.split('+')]
+    products = [count_atoms(c) for c in products_str.split('+')]
+    return reactants, products
 
+
+def balance_reaction(reaction): 
+ 
+    reactant_atoms, product_atoms = parse_reaction_simple(reaction)
+    
+    print( {reactant_atoms})
+    print({product_atoms})
