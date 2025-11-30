@@ -1,6 +1,3 @@
-
-
-
 def split_before_each_uppercases(formula):
    if not formula:
        return []
@@ -13,7 +10,8 @@ def split_before_each_uppercases(formula):
 
    split_formula.append(formula[start:len(formula)])
 
-   return split_formula
+  return split_formula
+
 def split_at_first_digit(formula):
     digit_location = 0
     for char in formula[1:]:
@@ -30,7 +28,7 @@ def split_at_first_digit(formula):
         numeric_part_str = formula[digit_location:]
         return (prefix, int(numeric_part_str))
 
-   def count_atoms_in_molecule(molecular_formula):
+def count_atoms_in_molecule(molecular_formula):
     atoms_count = {}
     for atom in split_by_capitals(molecular_formula):
         atom_name, atom_count = split_at_number(atom)
