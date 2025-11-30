@@ -30,16 +30,15 @@ def split_at_first_digit(formula):
         numeric_part_str = formula[digit_location:]
         return (prefix, int(numeric_part_str))
 
-   import re
-
-def count_atoms_in_molecule(molecular_formula):
-    counts = {}
-    pattern = r'([A-Z][a-z]*)(\d*)'
-    matches = re.findall(pattern, molecular_formula)
-    for atom_name, count_str in matches:
-        count = int(count_str) if count_str else 1
-        counts[atom_name] = counts.get(atom_name, 0) + count
-    return counts
+   def count_atoms_in_molecule(molecular_formula):
+    atoms_count = {}
+    for atom in split_by_capitals(molecular_formula):
+        atom_name, atom_count = split_at_number(atom)
+        if atom_name in atoms_count:
+            atoms_count[atom_name] += int(atom_count) if atom_count else 1
+        else:
+            atoms_count[atom_name] = int(atom_count) if atom_count else 1
+    return atoms_count
 
 def parse_chemical_reaction(reaction_equation):
     reaction_equation = reaction_equation.replace(" ", "")
